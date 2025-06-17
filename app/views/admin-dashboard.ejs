@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Dashboard Admin</title>
+<style>
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: url('/images/cinema.gif') no-repeat center center fixed;
+    background-size: cover;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    padding: 2rem;
+  }
+
+  h1, h2 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.7);
+  }
+
+  h1 {
+    font-size: 3em;
+  }
+
+  #btnUsers {
+    padding: 1rem 2rem;
+    font-size: 1.2rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    background-color: #ffd700;
+    color: #333;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-bottom: 2rem;
+  }
+
+  #btnUsers:hover {
+    background-color: #ffa500;
+  }
+
+  #usersList {
+    background: rgba(0, 0, 0, 0.6);
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+    width: 90%;
+    max-width: 800px;
+  }
+
+  .user-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #ccc;
+  }
+
+  .user-info {
+    font-size: 1.1rem;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+  }
+
+  th, td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid #444;
+  }
+
+  /* ✅ Ajout ici pour élargir la colonne "Action" */
+  td:last-child, th:last-child {
+    min-width: 220px;
+  }
+
+  th {
+    background-color: #222;
+    color: #ffd700;
+  }
+
+  tr:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .promote-btn,
+  .unpromote-btn,
+  .activer-btn,
+  .desactiver-btn {
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+
+  .promote-btn,
+  .activer-btn {
+    background-color: #32cd32;
+    color: white;
+  }
+
+  .promote-btn:hover,
+  .activer-btn:hover {
+    background-color: #28a428;
+    opacity: 0.9;
+  }
+
+  .unpromote-btn,
+  .desactiver-btn {
+    background-color: #ff4d4d;
+    color: white;
+  }
+
+  .unpromote-btn:hover,
+  .desactiver-btn:hover {
+    background-color: #cc0000;
+    opacity: 0.9;
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: nowrap;
+    justify-content: center;
+    min-width: 200px;
+  }
+
+  a {
+    display: inline-block;
+    margin-top: 2rem;
+    padding: 0.8rem 1.8rem;
+    background-color: #ffd700;
+    color: #333;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 8px;
+    box-shadow: 0 0 8px rgba(255, 215, 0, 0.7);
+    transition: background-color 0.3s ease;
+  }
+
+  a:hover {
+    background-color: #ffa500;
+    color: white;
+    box-shadow: 0 0 12px rgba(255, 165, 0, 0.9);
+  }
+
+  .retour {
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 0.6rem 1.2rem;
+    background-color: red;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
+    transition: background-color 0.3s ease;
+  }
+
+  .retour:hover {
+    background-color: red;
+    text-decoration: underline;
+  }
+</style>
+
+</head>
+<body>
+
+  <h1>Bienvenue admin</h1>
+
+  <button id="btnUsers">Voir la liste des utilisateurs</button>
+  <div id="usersList"></div>
+  <a href="/" class="retour">Deconnexion</a>
+  
+
+  <script>
+    document.getElementById("usersList").addEventListener("click", function(e) {
+      if (e.target.classList.contains("promote-btn")) {
+        const userId = e.target.getAttribute("data-id");
+        promote(userId);
+      } else if (e.target.classList.contains("unpromote-btn")) {
+        const userId = e.target.getAttribute("data-id");
+        unpromote(userId);
+      }
+    });
+    document.getElementById("usersList").addEventListener("click", e => {
+      if (e.target.classList.contains("activer-btn")) {
+        toggleActive(e.target.dataset.id, true);
+      } else if (e.target.classList.contains("desactiver-btn")) {
+        toggleActive(e.target.dataset.id, false);
+  }
+});
+
+    const token = "<%= token %>";
+    localStorage.setItem("token", token);
+
+    document.getElementById("btnUsers").onclick = () => {
+      fetch("/admin/users", {
+        headers: {
+          "x-access-token": token
+        }
+      })
+      .then(res => {
+        if (!res.ok) throw new Error("Non autorisé");
+        return res.text();
+      })
+      .then(html => {
+        document.getElementById("usersList").innerHTML = html;
+      })
+      .catch(err => {
+        alert("Erreur : " + err.message);
+      });
+    };
+
+    function promote(userId) {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("No token found, please login first.");
+        return;
+      }
+
+      fetch("/admin/promote", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-access-token": token
+        },
+        body: JSON.stringify({ userId })
+      })
+      .then(res => {
+        if (res.ok) {
+          alert("Utilisateur promu avec succès !");
+          location.reload();
+        } else {
+          return res.json().then(data => {
+            throw new Error(data.message);
+          });
+        }
+      })
+      .catch(err => {
+        alert("Erreur : " + err.message);
+      });
+    }
+
+    function unpromote(userId) {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("No token found, please login first.");
+        return;
+      }
+
+      fetch("/admin/demote", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-access-token": token
+        },
+        body: JSON.stringify({ userId })
+      })
+      .then(res => {
+        if (res.ok) {
+          alert("Utilisateur rétrogradé avec succès !");
+          location.reload();
+        } else {
+          return res.json().then(data => {
+            throw new Error(data.message);
+          });
+        }
+      })
+      .catch(err => {
+        alert("Erreur : " + err.message);
+      });
+    }
+    function toggleActive(userId, isActivate) {
+      fetch(isActivate ? "/admin/activer" : "/admin/desactiver",{
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-access-token": localStorage.getItem("token")
+        },
+      body: JSON.stringify({ userId })
+  })
+  .then(res => {
+    if (res.ok) {
+      location.reload();
+    } else {
+      return res.json().then(data => { throw new Error(data.message); });
+    }
+  })
+  .catch(err => {
+    alert("Erreur : " + err.message);
+  });
+}
+
+    window.promote = promote;
+    window.unpromote = unpromote;
+  </script>
+
+</body>
+</html>

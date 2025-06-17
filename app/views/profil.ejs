@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Profil Utilisateur</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: url('/images/cinema.gif') no-repeat center center fixed;
+      background-size: cover;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 3rem 1rem;
+      text-shadow: 1.5px 1.5px 4px rgba(0, 0, 0, 0.7);
+    }
+
+    h1 {
+      font-size: 2.8rem;
+      margin-bottom: 2rem;
+      text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.8);
+    }
+
+    p {
+      background: rgba(0, 0, 0, 0.6);
+      padding: 1rem 1.5rem;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+      width: 320px;
+      max-width: 90vw;
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+      color: #ffd700;
+    }
+
+    strong {
+      color: #ffa500;
+    }
+
+    a {
+      display: inline-block;
+      margin-top: 2rem;
+      padding: 0.8rem 1.8rem;
+      background-color: red;
+      color: #333;
+      text-decoration: none;
+      font-weight: bold;
+      border-radius: 8px;
+      box-shadow: 0 0 8px rgba(255, 215, 0, 0.7);
+      transition: background-color 0.3s ease;
+    }
+
+    a:hover {
+      background-color: red;
+      color: white;
+      box-shadow: 0 0 12px rgba(255, 165, 0, 0.9);
+    }
+  </style>
+</head>
+<body>
+  <h1>Profil de <%= username %></h1>
+  <p><strong>Nom d'utilisateur :</strong> <%= username %></p>
+  <p><strong>Email :</strong> <%= email %></p>
+  <a href="/">Deconnexion</a>
+</body>
+</html>

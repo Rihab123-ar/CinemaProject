@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Dashboard Utilisateur</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: url('/images/cinema.gif') no-repeat center center fixed;
+      background-size: cover;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 2rem;
+    }
+
+    h1 {
+      font-size: 3em;
+      margin-bottom: 1.5rem;
+      text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.7);
+    }
+
+    .btn {
+      padding: 1rem 2rem;
+      font-size: 1.2rem;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      background-color: #ffd700;
+      color: #333;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      margin-bottom: 1.5rem;
+      text-decoration: none;
+      text-align: center;
+      display: inline-block;
+    }
+
+    .btn:hover {
+      background-color: #ffa500;
+      color: white;
+    }
+
+    .retour {
+      display: inline-block;
+      margin-top: 1rem;
+      padding: 0.6rem 1.2rem;
+      background-color: red;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
+      transition: background-color 0.3s ease;
+    }
+
+    .retour:hover {
+      background-color: darkred;
+      text-decoration: underline;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.2rem;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Bienvenue, <%= username %></h1>
+
+  <div class="container">
+    <a href="/queues" class="btn">📄 Consulter les films</a>
+    <a href="/profil?token=<%= token %>" class="btn">👤 Consulter les informations personnelles</a>
+    <a href="/reservations?token=<%= token %>" class="btn">📋 Consulter les réservations</a>
+    <a href="/payments?token=<%= token %>" class="btn">💳 Consulter les paiements</a>
+  </div>
+  <a href="/" class="retour">Déconnexion</a>
+
+</body>
+</html>

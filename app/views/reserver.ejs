@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Réserver <%= film.titre %></title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: url('/images/cinema.gif') no-repeat center center fixed;
+      background-size: cover;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 2rem;
+    }
+    
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 1rem;
+      text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.7);
+    }
+    
+    .film-info {
+      background-color: rgba(0, 0, 0, 0.7);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      width: 80%;
+      max-width: 800px;
+    }
+    
+    .film-info h2 {
+      color: #ffd700;
+      margin-top: 0;
+    }
+    
+    .reservation-form {
+      background-color: rgba(0, 0, 0, 0.7);
+      border-radius: 10px;
+      padding: 2rem;
+      width: 80%;
+      max-width: 600px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+    
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: bold;
+    }
+    
+    .form-group input, 
+    .form-group select {
+      width: 100%;
+      padding: 0.8rem;
+      border-radius: 5px;
+      border: 1px solid #444;
+      background-color: #333;
+      color: white;
+    }
+    
+    .form-row {
+      display: flex;
+      gap: 1rem;
+    }
+    
+    .form-row .form-group {
+      flex: 1;
+    }
+    
+    .btn {
+      padding: 1rem 2rem;
+      font-size: 1.1rem;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      background-color: #ffd700;
+      color: #333;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+      width: 100%;
+      text-align: center;
+    }
+    
+    .btn:hover {
+      background-color: #ffa500;
+      color: white;
+    }
+    
+    .retour {
+      display: inline-block;
+      margin-top: 1.5rem;
+      padding: 0.6rem 1.2rem;
+      background-color: red;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
+      transition: background-color 0.3s ease;
+    }
+    
+    .retour:hover {
+      background-color: darkred;
+      text-decoration: underline;
+    }
+    
+    .seances-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .seance-btn {
+      padding: 0.8rem 1.2rem;
+      background-color: #333;
+      color: white;
+      border: 1px solid #ffd700;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .seance-btn:hover {
+      background-color: #ffd700;
+      color: #333;
+    }
+    
+    .seance-btn.selected {
+      background-color: #ffd700;
+      color: #333;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>Réserver: <%= film.titre %></h1>
+  
+  <div class="film-info">
+    <h2><%= film.titre %></h2>
+    <p><strong>Durée:</strong> <%= film.duree %> minutes</p>
+    <p><strong>Genre:</strong> <%= film.genre %></p>
+    <p><strong>Description:</strong> <%= film.description %></p>
+  </div>
+  
+  <form action="/user/confirmer-reservation" method="POST" class="reservation-form">
+    <input type="hidden" name="filmId" value="<%= film.id %>">
+    
+    <div class="form-group">
+      <label for="date">Date de projection:</label>
+      <input type="date" id="date" name="date" required min="<%= new Date().toISOString().split('T')[0] %>">
+    </div>
+    
+    <div class="form-group">
+      <label>Séances disponibles:</label>
+      <div class="seances-container">
+        <% seances.forEach(seance => { %>
+          <button type="button" class="seance-btn" data-salle="<%= seance.salle_id %>" data-heure="<%= seance.heure %>">
+            <%= seance.heure %> (Salle <%= seance.salle_numero %>)
+          </button>
+        <% }); %>
+      </div>
+      <input type="hidden" id="seance" name="seance" required>
+    </div>
+    
+    <div class="form-row">
+      <div class="form-group">
+        <label for="places">Nombre de places:</label>
+        <select id="places" name="places" required>
+          <% for(let i = 1; i <= 10; i++) { %>
+            <option value="<%= i %>"><%= i %> place<%= i > 1 ? 's' : '' %></option>
+          <% } %>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label for="type">Type de place:</label>
+        <select id="type" name="type" required>
+          <option value="plein">Plein tarif (10€)</option>
+          <option value="reduit">Tarif réduit (8€)</option>
+          <option value="enfant">Enfant (5€)</option>
+        </select>
+      </div>
+    </div>
+    
+    <div class="form-group">
+      <label for="paiement">Méthode de paiement:</label>
+      <select id="paiement" name="paiement" required>
+        <option value="carte">Carte bancaire</option>
+        <option value="paypal">PayPal</option>
+        <option value="especes">Sur place (en espèces)</option>
+      </select>
+    </div>
+    
+    <button type="submit" class="btn">Confirmer la réservation</button>
+  </form>
+  
+  <a href="/user/queues" class="retour">Retour à la liste des films</a>
+  
+  <script>
+    document.querySelectorAll('.seance-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.seance-btn').forEach(b => b.classList.remove('selected'));
+        this.classList.add('selected');
+        document.getElementById('seance').value = this.dataset.salle + '|' + this.dataset.heure;
+      });
+    });
+  </script>
+</body>
+</html>

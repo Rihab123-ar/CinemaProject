@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Réservation confirmée</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: url('/images/cinema.gif') no-repeat center center fixed;
+      background-size: cover;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 2rem;
+    }
+    
+    .confirmation-card {
+      background-color: rgba(0, 0, 0, 0.8);
+      border-radius: 10px;
+      padding: 3rem;
+      max-width: 600px;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    }
+    
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 1.5rem;
+      color: #ffd700;
+    }
+    
+    .confirmation-icon {
+      font-size: 5rem;
+      color: #4CAF50;
+      margin-bottom: 1.5rem;
+    }
+    
+    .reservation-details {
+      background-color: rgba(255, 215, 0, 0.1);
+      border-left: 4px solid #ffd700;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      text-align: left;
+    }
+    
+    .reservation-details p {
+      margin: 0.5rem 0;
+    }
+    
+    .reservation-details strong {
+      color: #ffd700;
+    }
+    
+    .btn {
+      padding: 1rem 2rem;
+      font-size: 1.1rem;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      background-color: #ffd700;
+      color: #333;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+      margin: 0.5rem;
+    }
+    
+    .btn:hover {
+      background-color: #ffa500;
+      color: white;
+    }
+    
+    .btn-imprimer {
+      background-color: #333;
+      color: white;
+      border: 1px solid #ffd700;
+    }
+    
+    .btn-imprimer:hover {
+      background-color: #444;
+    }
+  </style>
+</head>
+<body>
+  <div class="confirmation-card">
+    <div class="confirmation-icon">✓</div>
+    <h1>Réservation confirmée !</h1>
+    <p>Votre réservation a été enregistrée avec succès.</p>
+    
+    <div class="reservation-details">
+      <p><strong>Film:</strong> <%= reservation.film.titre %></p>
+      <p><strong>Date:</strong> <%= reservation.date_seance %></p>
+      <p><strong>Heure:</strong> <%= reservation.heure_seance %></p>
+      <p><strong>Salle:</strong> <%= reservation.salle.nom %></p>
+      <p><strong>Places:</strong> <%= reservation.nb_places %> (<%= reservation.type_place %>)</p>
+      <p><strong>Total:</strong> <%= reservation.montant %> €</p>
+      <p><strong>Référence:</strong> <%= reservation.reference %></p>
+    </div>
+    
+    <p>Un email de confirmation vous a été envoyé à l'adresse <%= user.email %>.</p>
+    
+    <div>
+      <a href="/user/reservations" class="btn">Voir mes réservations</a>
+      <a href="/user/queues" class="btn">Voir d'autres films</a>
+      <button onclick="window.print()" class="btn btn-imprimer">Imprimer</button>
+    </div>
+  </div>
+</body>
+</html>

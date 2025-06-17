@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Gestion des Paiements</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      position: relative;
+    }
+    h1 {
+      color: #333;
+      text-align: center;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+    th {
+      background-color: #ffd700;
+      color: #333;
+    }
+    tr:hover {
+      background-color: #f5f5f5;
+    }
+    .actions {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+    select, input {
+      padding: 8px 10px;
+      border-radius: 4px;
+      border: 1px solid #ddd;
+      margin-bottom: 10px;
+      width: 100%;
+      box-sizing: border-box;
+      font-size: 1rem;
+    }
+    button {
+      background-color: #ffd700;
+      color: #333;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.3s;
+      font-size: 1.1rem;
+    }
+    button:hover {
+      background-color: #ffa500;
+    }
+    .retour {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 10px 15px;
+      background-color: #333;
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+      transition: background-color 0.3s;
+    }
+    .retour:hover {
+      background-color: #555;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+      color: #333;
+    }
+    .form-container {
+      background: #f9f9f9;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      border: 1px solid #ddd;
+    }
+    #message {
+      position: fixed;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: white;
+      padding: 12px 20px;
+      border-radius: 5px;
+      font-weight: bold;
+      display: none;
+      z-index: 1000;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      animation: fadeIn 0.3s ease forwards;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; top: 0; }
+      to { opacity: 1; top: 10px; }
+    }
+    /* Styles spécifiques boutons supprimer/modifier */
+    .actions form {
+      margin: 0;
+    }
+    .actions button.delete-btn {
+      background-color: #e74c3c;
+      padding: 6px 15px;
+      font-size: 0.9rem;
+      margin: 0;
+      border-radius: 4px;
+      color: white;
+    }
+    .actions button.delete-btn:hover {
+      background-color: #b62b1a;
+    }
+    .actions button.edit-btn {
+      background-color: #3498db;
+      padding: 6px 15px;
+      font-size: 0.9rem;
+      border-radius: 4px;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    .actions button.edit-btn:hover {
+      background-color: #1f6aa5;
+    }
+    /* Modal styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      width: 400px;
+      max-width: 90%;
+      box-shadow: 0 0 15px rgba(0,0,0,0.3);
+      position: relative;
+    }
+    .modal-close {
+      position: absolute;
+      top: 10px; right: 15px;
+      font-size: 1.3rem;
+      font-weight: bold;
+      cursor: pointer;
+      color: #888;
+    }
+    .modal-close:hover {
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Gestion des Paiements</h1>
+
+    <div id="message"></div>
+
+    <!-- Formulaire d'ajout -->
+    <div class="form-container">
+      <h2>Ajouter un paiement</h2>
+      <form action="/moderator/payments" method="POST">
+        <div class="form-group">
+  <label for="id_reservation">Réservation :</label>
+  <select id="id_reservation" name="id_reservation" required>
+    <% if (reservations && reservations.length > 0) { %>
+      <% reservations.forEach(reservation => { %>
+        <% if (reservation.seance && reservation.seance.film) { %>
+          <option value="<%= reservation.id %>">
+            Réservation #<%= reservation.id %> - 
+            <%= reservation.user ? reservation.user.username : 'Utilisateur inconnu' %> - 
+            <%= reservation.seance.film.titre %> - 
+            <%= reservation.nb_places %> places - 
+            Total: <%= calculateTotal(reservation) %> DT
+          </option>
+        <% } %>
+      <% }); %>
+    <% } else { %>
+      <option value="" disabled>Aucune réservation disponible</option>
+    <% } %>
+  </select>
+</div>
+        <div class="form-group">
+          <label for="methode_paiement">Méthode de paiement :</label>
+          <select id="methode_paiement" name="methode_paiement" required>
+            <option value="espèce">Espèce</option>
+            <option value="carte">Carte</option>
+            <option value="en ligne">En ligne</option>
+          </select>
+        </div>
+        <button type="submit">Ajouter</button>
+      </form>
+    </div>
+
+    <!-- Tableau des paiements -->
+    <h2>Liste des paiements</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Montant (DT)</th>
+          <th>Date de paiement</th>
+          <th>Méthode</th>
+          <th>Statut</th>
+          <th>Réservation</th>
+          <th>Film</th>
+          <th>Places</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <!-- ... (code précédent inchangé) ... -->
+<tbody>
+  <% payments.forEach(payment => { %>
+    <tr data-id="<%= payment.id %>" data-methode="<%= payment.methode_paiement %>" data-statut="<%= payment.statut %>" data-reservation="<%= payment.reservationId %>">
+      <td><%= payment.id %></td>
+      <td><%= payment.montant %></td>
+      <td><%= payment.date_paiement ? new Date(payment.date_paiement).toLocaleDateString() : '' %></td>
+      <td><%= payment.methode_paiement %></td>
+      <td><%= payment.statut %></td>
+      <td>
+        <% if (payment.reservation) { %>
+          #<%= payment.reservation.id %> (<%= payment.reservation.user.username %>)
+        <% } else { %>
+          Réservation supprimée
+        <% } %>
+      </td>
+      <td>
+        <% if (payment.reservation && payment.reservation.seance && payment.reservation.seance.film) { %>
+          <%= payment.reservation.seance.film.titre %>
+        <% } else { %>
+          N/A
+        <% } %>
+      </td>
+      <td>
+        <% if (payment.reservation) { %>
+          <%= payment.reservation.nb_places %>
+        <% } else { %>
+          N/A
+        <% } %>
+      </td>
+      <td class="actions">
+        <button class="edit-btn" type="button">Modifier</button>
+        <form action="/moderator/payments/<%= payment.id %>?_method=DELETE" method="POST" class="form-supprimer" style="display:inline;">
+          <button type="submit" class="delete-btn">Supprimer</button>
+        </form>
+      </td>
+    </tr>
+  <% }); %>
+</tbody>
+<!-- ... (code suivant inchangé) ... -->
+    </table>
+
+    <a href="/moderator/dashboard" class="retour">Retour au dashboard</a>
+  </div>
+
+  <!-- Modal Modification -->
+  <div class="modal" id="editModal">
+    <div class="modal-content">
+      <span class="modal-close" id="modalClose">&times;</span>
+      <h2>Modifier un paiement</h2>
+      <form id="editForm" method="POST">
+        <div class="form-group">
+          <label for="edit_methode_paiement">Méthode de paiement :</label>
+          <select id="edit_methode_paiement" name="methode_paiement" required>
+            <option value="espèce">Espèce</option>
+            <option value="carte">Carte</option>
+            <option value="en ligne">En ligne</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="edit_statut">Statut :</label>
+          <select id="edit_statut" name="statut" required>
+            <option value="payé">Payé</option>
+            <option value="non payé">Non payé</option>
+          </select>
+        </div>
+        <button type="submit">Enregistrer</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Confirmation avant suppression
+    document.querySelectorAll('.form-supprimer').forEach(form => {
+      form.addEventListener('submit', e => {
+        if (!confirm('Voulez-vous vraiment supprimer ce paiement ?')) {
+          e.preventDefault();
+        }
+      });
+    });
+
+    // Modal modification
+    const editModal = document.getElementById('editModal');
+    const modalClose = document.getElementById('modalClose');
+    const editForm = document.getElementById('editForm');
+
+    // Ouvrir modal et remplir le formulaire avec les données du paiement
+    document.querySelectorAll('.edit-btn').forEach(button => {
+      button.addEventListener('click', e => {
+        const tr = e.target.closest('tr');
+        const id = tr.getAttribute('data-id');
+        const methode = tr.getAttribute('data-methode');
+        const statut = tr.getAttribute('data-statut');
+
+        // Remplissage du formulaire
+        editForm.action = `/moderator/payments/${id}?_method=PUT`;
+        editForm.querySelector('#edit_methode_paiement').value = methode;
+        editForm.querySelector('#edit_statut').value = statut;
+
+        // Afficher la modal
+        editModal.style.display = 'flex';
+      });
+    });
+
+    // Fermer modal
+    modalClose.addEventListener('click', () => {
+      editModal.style.display = 'none';
+    });
+
+    // Fermer modal en cliquant en dehors du contenu
+    window.addEventListener('click', e => {
+      if (e.target === editModal) {
+        editModal.style.display = 'none';
+      }
+    });
+  </script>
+</body>
+</html>

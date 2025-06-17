@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Liste des utilisateurs</title>
+  <meta charset="UTF-8">
+</head>
+<body>
+<h2>Liste des utilisateurs</h2>
+<table border="1">
+  <tr>
+    <th>ID</th><th>Nom</th><th>Email</th><th>Rôles</th><th>Action</th>
+  </tr>
+  <% users.forEach(user => { %>
+    <tr>
+      <td><%= user.id %></td>
+      <td><%= user.username %></td>
+      <td><%= user.email %></td>
+      <td>
+        <% user.roles.forEach((role, index) => { %>
+          <%= role.name %><% if (index !== user.roles.length - 1) { %>, <% } %>
+        <% }) %>
+      </td>
+      <td>
+        <div class="action-buttons">
+          <% if (user.roles.some(r => r.name === 'moderator')) { %>
+            <button class="unpromote-btn" data-id="<%= user.id %>">User</button>
+            <% } else { %>
+              <button class="promote-btn" data-id="<%= user.id %>">Moderator</button>
+              <% } %>
+          <% if (user.active) { %>
+            <button class="desactiver-btn" data-id="<%= user.id %>">Deactiver</button>
+            <% } else { %>
+              <button class="activer-btn" data-id="<%= user.id %>">Activer</button>
+              <% } %>
+        </div>
+      </td>
+    </tr>
+  <% }) %>
+</table>
+<script>
+  function promote(userId) {
+    console.log("Promote clicked for userId:", userId);
+    const token = localStorage.getItem("token");
+    console.log("Token:", token);
+
+    if (!token) {
+      alert("No token found, please login first.");
+      return;
+    }
+
+    fetch("/admin/promote", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-access-token": token
+      },
+      body: JSON.stringify({ userId })
+    })
+    .then(res => {
+      console.log("Response status:", res.status);
+      if (res.ok) {
+        alert("User promoted successfully!");
+        location.reload();
+      } else {
+        return res.json().then(data => {
+          console.log("Error data:", data);
+          throw new Error(data.message);
+        });
+      }
+    })
+    .catch(err => {
+      alert("Erreur : " + err.message);
+    });
+  }
+  function unpromote(userId) {
+  console.log("Unpromote clicked for userId:", userId);
+
+  const token = localStorage.getItem("token");
+  if (!token) {
+    alert("No token found, please login first.");
+    return;
+  }
+
+  fetch("/admin/demote", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-access-token": token
+    },
+    body: JSON.stringify({ userId })
+  })
+  .then(res => {
+    if (res.ok) {
+      alert("User demoted successfully!");
+      location.reload();
+    } else {
+      return res.json().then(data => {
+        throw new Error(data.message);
+      });
+    }
+  })
+  .catch(err => {
+    alert("Erreur : " + err.message);
+  });
+}
+
+
+</script>
+
+</body>
+</html>
+

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Mes Réservations</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: url('/images/cinema.gif') no-repeat center center fixed;
+      background-size: cover;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 2rem;
+    }
+
+    h1 {
+      font-size: 3em;
+      margin-bottom: 1.5rem;
+      text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.7);
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 80%;
+      background-color: rgba(0, 0, 0, 0.6);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    th, td {
+      padding: 1rem;
+      text-align: center;
+      border-bottom: 1px solid #444;
+    }
+
+    th {
+      background-color: #ffd700;
+      color: #333;
+      font-size: 1.2rem;
+    }
+
+    td {
+      font-size: 1.1rem;
+    }
+
+    .retour {
+      display: inline-block;
+      margin-top: 2rem;
+      padding: 0.6rem 1.2rem;
+      background-color: red;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
+      transition: background-color 0.3s ease;
+    }
+
+    .retour:hover {
+      background-color: darkred;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Mes Réservations</h1>
+
+  <% if (reservations.length > 0) { %>
+    <table>
+      <thead>
+        <tr>
+          <th>Nombre de places</th>
+          <th>Statut</th>
+          <th>Date de réservation</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% reservations.forEach(function(reservation) { %>
+          <tr>
+            <td><%= reservation.nb_places %></td>
+            <td><%= reservation.statut %></td>
+            <td><%= reservation.date_reservation.toLocaleDateString('fr-FR') %> <%= reservation.date_reservation.toLocaleTimeString('fr-FR') %></td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  <% } else { %>
+    <p>Vous n'avez aucune réservation pour le moment.</p>
+  <% } %>
+
+   <a href="/">Deconnexion</a>
+
+</body>
+</html>
